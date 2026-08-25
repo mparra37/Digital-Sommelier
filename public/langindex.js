@@ -1,10 +1,19 @@
 // langindex.js
 
+function getSessionId() {
+    let id = sessionStorage.getItem('sessionId');
+    if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
+        sessionStorage.setItem('sessionId', id);
+    }
+    return id;
+}
+
 var isRecording = false;
-var recognition = new webkitSpeechRecognition();
+var recognition;
 document.addEventListener('DOMContentLoaded', () => {
     if ('webkitSpeechRecognition' in window) {
-        
+        recognition = new webkitSpeechRecognition();
         recognition.continuous = true; // Set this to true if you want the recognition to continue even after it detects a pause in speaking
         recognition.interimResults = true; // Show interim results
         recognition.lang = 'es-MX'; // en-US, es-MX
@@ -59,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add keydown event listener to document
 document.addEventListener('keydown', function(event) {
     // Check if number 0 key was pressed
-    if (event.key === " ArrowDown" || event.keyCode===40) {
+    if ((event.key === " ArrowDown" || event.keyCode===40) && recognition) {
         // Prevent the default spacebar action (scrolling the page down)
         event.preventDefault();
         var boton_micro = document.getElementById('voice-typing-button');
@@ -148,7 +157,7 @@ async function enviar(){
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ prompt: userInput })
+            body: JSON.stringify({ prompt: userInput, sessionId: getSessionId() })
         });
         const responseData = await response.json();
 
@@ -183,7 +192,7 @@ document.getElementById('initiate-button').addEventListener('click', ()=> {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ }),
+        body: JSON.stringify({ sessionId: getSessionId() }),
     })
     .then(response => response.json())
     .then(data => {
@@ -221,6 +230,19 @@ function animateText(text, container) {
 
 document.getElementById('talk-button').addEventListener('click', () => {
     enviar();
+});
+
+// Enter sends the message; Shift+Enter still inserts a newline.
+document.getElementById('user-input-field').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        enviar();
+    }
+});
+
+document.getElementById('toggle-chat-button').addEventListener('click', function() {
+    document.getElementById('der').classList.toggle('chat-hidden');
+    this.classList.toggle('active');
 });
 
 

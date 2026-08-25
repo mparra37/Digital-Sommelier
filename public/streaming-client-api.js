@@ -3,12 +3,19 @@
 //import DID_API from '../../api.json' assert { type: 'json' };
 //const DID_API = require('../../api.json');
 'use strict';
-const fetchJsonFile = await fetch("./api.json")
-const DID_API = await fetchJsonFile.json()
 
+let DID_API = null;
+try {
+  const fetchJsonFile = await fetch("./api.json");
+  if (!fetchJsonFile.ok) throw new Error(`HTTP ${fetchJsonFile.status}`);
+  DID_API = await fetchJsonFile.json();
+} catch (e) {
+  console.error('Could not load ./api.json — the avatar video will stay disabled. Copy api.json.example to api.json and fill in your D-ID key.', e);
+}
 
-if (DID_API.key === '🤫') {
-  alert('Please put your API key inside ./api.json and restart.');
+if (!DID_API || !DID_API.key || DID_API.key === '🤫') {
+  console.warn('Missing/invalid D-ID API key in ./api.json. Avatar video is disabled; text chat still works.');
+  DID_API = null;
 }
 
 //same  - No edits from Github example for this whole section
@@ -36,9 +43,49 @@ const signalingStatusLabel = document.getElementById('signaling-status-label');
 const streamingStatusLabel = document.getElementById('streaming-status-label');
 //var conectado = false;
 
+// Output mode: 'voice' speaks replies with the browser's built-in
+// text-to-speech and never shows/connects the avatar; 'avatar' speaks
+// replies through the D-ID talking-head video and never uses browser TTS.
+// The mic (speech-to-text) button is independent of this and always works.
+let outputMode = 'voice';
+const modeVoiceButton = document.getElementById('mode-voice-button');
+const modeAvatarButton = document.getElementById('mode-avatar-button');
+
+// Connecting to D-ID (session setup + SDP/ICE negotiation) is async and not
+// instant, so a reply can arrive before peerConnection reaches 'connected'.
+// Hold onto the latest such reply and speak it as soon as the connection is
+// ready, instead of silently dropping it.
+let pendingAvatarSpeech = null;
+
+function setOutputMode(mode) {
+  outputMode = mode;
+  modeVoiceButton.classList.toggle('active', mode === 'voice');
+  modeAvatarButton.classList.toggle('active', mode === 'avatar');
+  connectButton.disabled = mode !== 'avatar';
+
+  if (mode === 'voice') {
+    window.speechSynthesis && window.speechSynthesis.cancel();
+    pendingAvatarSpeech = null;
+    if (peerConnection) {
+      disconnectAvatar();
+    }
+  }
+}
+
+modeVoiceButton.addEventListener('click', () => setOutputMode('voice'));
+modeAvatarButton.addEventListener('click', () => setOutputMode('avatar'));
+
 const connectButton = document.getElementById('connect-button');
 connectButton.onclick = async () => {
+  if (outputMode !== 'avatar') {
+    return; // button is disabled in this mode, but guard anyway
+  }
   //conectado = true;
+  playIdleVideo(); // instant feedback: show the idle avatar right away, even before/without D-ID
+  if (!DID_API) {
+    alert('D-ID is not configured: copy public/api.json.example to public/api.json and add your key.');
+    return;
+  }
   if (peerConnection && peerConnection.connectionState === 'connected') {
     return;
   }
@@ -88,25 +135,35 @@ connectButton.onclick = async () => {
     });
 };
 
-// This is the event listener that checks the checkbox before proceeding
+setOutputMode(outputMode); // apply initial UI state (connect button disabled, active pill) now that connectButton exists
+
+// Speaks each chat reply according to the selected output mode. In 'avatar'
+// mode, browser TTS is never used — audio comes only from the D-ID video
+// stream; if the avatar isn't connected yet, the reply is silent (the user
+// must click Connect first) rather than silently falling back to TTS.
 document.addEventListener('chatResponse', async (event) => {
   const chatResponse = event.detail; // The detail property contains the response data
 
-
-  if (peerConnection && peerConnection.connectionState === 'connected') {
-    handleDIDStreaming(chatResponse);
-  }else{
-    console.log("DID streaming is toggled off. Not sending to DID.");
+  if (outputMode === 'avatar') {
+    if (peerConnection && peerConnection.connectionState === 'connected') {
+      handleDIDStreaming(chatResponse);
+    } else {
+      console.warn('Avatar mode is selected but not connected yet — will speak this reply once the connection is ready.');
+      pendingAvatarSpeech = chatResponse;
+    }
+  } else {
+    speakLocally(chatResponse);
   }
-  // Check if the "Send to DID" checkbox is checked
-  //const toggleDIDCheckbox = document.getElementById('toggleDID');
-  //if (toggleDIDCheckbox && toggleDIDCheckbox.checked) {
-    // Only call handleDIDStreaming if the checkbox is checked
-    //handleDIDStreaming(chatResponse);
-  //} else {
-    console.log("DID streaming is toggled off. Not sending to DID.");
-  //}
 });
+
+// Browser text-to-speech, used for 'voice' output mode.
+function speakLocally(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  window.speechSynthesis.cancel(); // don't stack utterances if replies come quickly
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-MX';
+  window.speechSynthesis.speak(utterance);
+}
 
 // You need a function like this to handle the streaming logic with D-ID API
 async function handleDIDStreaming(chatResponse) {
@@ -166,8 +223,13 @@ async function handleDIDStreaming(chatResponse) {
 // NOTHING BELOW THIS LINE IS CHANGED FROM ORIGNAL D-id File Example
 //
 
-const destroyButton = document.getElementById('destroy-button');
-destroyButton.onclick = async () => {
+async function disconnectAvatar() {
+  pendingAvatarSpeech = null;
+  if (!DID_API || !streamId) {
+    stopAllStreams();
+    closePC();
+    return;
+  }
   await fetch(`${DID_API.url}/talks/streams/${streamId}`, {
     method: 'DELETE',
     headers: {
@@ -179,7 +241,10 @@ destroyButton.onclick = async () => {
 
   stopAllStreams();
   closePC();
-};
+}
+
+const destroyButton = document.getElementById('destroy-button');
+destroyButton.onclick = disconnectAvatar;
 
 function onIceGatheringStateChange() {
   iceGatheringStatusLabel.innerText = peerConnection.iceGatheringState;
@@ -217,6 +282,12 @@ function onConnectionStateChange() {
   // not supported in firefox
   peerStatusLabel.innerText = peerConnection.connectionState;
   peerStatusLabel.className = 'peerConnectionState-' + peerConnection.connectionState;
+
+  if (peerConnection.connectionState === 'connected' && pendingAvatarSpeech) {
+    const text = pendingAvatarSpeech;
+    pendingAvatarSpeech = null;
+    handleDIDStreaming(text);
+  }
 }
 function onSignalingStateChange() {
   signalingStatusLabel.innerText = peerConnection.signalingState;

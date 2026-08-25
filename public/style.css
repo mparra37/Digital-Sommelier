@@ -1,244 +1,439 @@
-/*#user-input-field {
-          width: 100%; /* Set desired width here */
-          /*padding: 8px; /* Adding some padding for better appearance */
-          /*box-sizing: border-box; /* So the width includes padding */
-          /*margin: 0 auto; /* Centering the input box */
-          /*display: block; /* To apply margin auto */
-      /*}*/
-      body {
-        height: 100%;
-      background-color: #121212;
-      color: #ffffff;
-      font-family: 'Mulish', sans-serif;
-      }
-      .peerConnectionState-new {
-        color: cornflowerblue;
-      }
-      .peerConnectionState-connecting {
-        color: orange;
-      }
-      .peerConnectionState-connected {
-        color: green;
-      }
-      .peerConnectionState-disconnected,
-      .peerConnectionState-closed,
-      .peerConnectionState-failed {
-        color: red;
-      }
-
-      .iceConnectionState-new {
-        color: cornflowerblue;
-      }
-      .iceConnectionState-checking {
-        color: orange;
-      }
-      .iceConnectionState-connected,
-      .iceConnectionState-completed {
-        color: green;
-      }
-      .peerConnectionState-disconnected,
-      .peerConnectionState-closed,
-      .peerConnectionState-failed {
-        color: red;
-      }
-
-      .iceGatheringState-new {
-        color: cornflowerblue;
-      }
-      .iceGatheringState-gathering {
-        color: orange;
-      }
-      .iceGatheringState-complete {
-        color: black;
-      }
-
-      .signalingState-stable {
-        color: green;
-      }
-      .signalingState-have-local-offer,
-      .signalingState-have-remote-offer,
-      .signalingState-have-local-pranswer,
-      .signalingState-have-remote-pranswer {
-        color: cornflowerblue;
-      }
-      .signalingState-closed {
-        color: red;
-      }
-
-      .streamingState-streaming {
-        color: green;
-      }
-
-      .streamingState-empty {
-        color: grey;
-      }
-
-      /* added css from here */
-
-      body * {
-        font-family: 'Mulish', sans-serif;
-        text-align: center;
-      }
-
-      #content {
-        /*width: 820px;*/
-        position: relative;
-        margin: 0 auto;
-      }
-
-      #buttons {
-        clear: both;
-        padding: 0 0 0 0;
-        text-align: center;
-      }
-
-      /*button {
-        padding: 10px 20px;
-        border-radius: 5px;
-        border: none;
-        font-size: 16px;
-        margin: 0 5px;
-        background-color: #7459fe;
-        color: #fff;
-        margin-bottom: 20px; 
-      }
-
-      button:hover {
-        background-color: #9480ff;
-        cursor: pointer;
-        transition: all 0.2s ease-out;
-      }*/
-
-      #status {
-        clear: both;
-        padding: 20px 0 0 0;
-        text-align: left;
-        display: inline-block;
-        zoom: 1;
-        line-height: 140%;
-        font-size: 15px;
-      }
-
-      #status div {
-        padding-bottom: 10px;
-      }
-
-      #video-wrapper {
-        
-        background: url('winery.png')
-                center/cover no-repeat;
-        /*height: 500px; */
-        background-position: top;
-      }
-
-      #video-wrapper div {
-        width: 400px; 
-        margin: 0 auto;
-        padding: 50px 0 0 0;
-      }
-      video {
-        display: block;
-        /* border:1px solid; */
-        border-radius: 50%;
-        background-color: #000;
-        margin: auto;
-      }
-
-     /* #response-container {
-      text-align: left;
-      margin-left: 20px;
-      color: #000000;
-      background-color: #ffffff;
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 150px; /* Adjust the max-height as needed, approximately 10 lines */
-   /*   overflow-y: auto; /* Adds a scrollbar if content exceeds the container's height */
-      /* You might need to adjust line-height and font-size to fine-tune the 10 lines appearance */
-     /* line-height: 1.6; /* Adjust line height for better readability */
-     /* font-size: 16px; /* Adjust font size as needed */
-     /* margin-top: 20px;
+:root {
+  --bg: #121016;
+  --bg-elevated: #1b1720;
+  --panel: #201b26;
+  --panel-border: #34293a;
+  --wine: #8f2440;
+  --wine-light: #c94868;
+  --wine-glow: rgba(201, 72, 104, 0.35);
+  --gold: #cda45e;
+  --text: #f3eceb;
+  --text-dim: #b8adb6;
+  --ok: #4caf7d;
+  --warn: #e0a53c;
+  --bad: #d9534f;
+  --radius-lg: 22px;
+  --radius-md: 14px;
 }
 
-#content {
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto;
-  max-width: 1200px; /* Adjust based on your total desired width */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
 }
 
-#video-wrapper {
-  flex: 4; /* Takes more space */
-  background: url(winery.png);
-  background-position: top;
-  /* Other styles remain the same */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% -10%, rgba(143, 36, 64, 0.25), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-#right-container {
-  flex: 2; /* Takes less space, adjust as needed */
+body * {
+  font-family: inherit;
+}
+
+#principal {
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ---------- App shell ---------- */
+
+#izq {
   display: flex;
   flex-direction: column;
-  padding-left: 20px; /* Add some spacing between the video and the right container */
+  min-height: 100vh;
+  padding: 0 !important;
+  border: none !important;
 }
 
-/* Update other styles as necessary to fit the new layout */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-header h1 .wine-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--wine-light);
+  box-shadow: 0 0 10px var(--wine-glow);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.chat-toggle-btn:hover {
+  color: var(--text);
+}
+
+.chat-toggle-btn.active {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+}
+
+#der.chat-hidden {
+  display: none !important;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  background: var(--bg-elevated);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+
+.status-pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: background-color 0.2s ease;
+}
+
+.status-pill:has(.peerConnectionState-connected) .dot {
+  background: var(--ok);
+  box-shadow: 0 0 6px var(--ok);
+}
+.status-pill:has(.peerConnectionState-connecting) .dot {
+  background: var(--warn);
+  box-shadow: 0 0 6px var(--warn);
+}
+.status-pill:has(.peerConnectionState-failed) .dot,
+.status-pill:has(.peerConnectionState-disconnected) .dot,
+.status-pill:has(.peerConnectionState-closed) .dot {
+  background: var(--bad);
+  box-shadow: 0 0 6px var(--bad);
+}
+
+/* ---------- Main layout ---------- */
+
+.app-body {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 24px;
+  padding: 28px;
+}
+
 #video_llamada {
-    background-image: url('winery.png');
-    background-size: cover; /* Cover the entire div */
-    background-position: center; /* Center the background image */
-    height: 100%;
-    text-align: center;
+  flex: 1 1 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: none;
+  min-height: 420px;
 }
 
-#response-container{
-    height: 100px;
-    padding: 10px;
-    overflow-y: auto; 
+.video-frame {
+  position: relative;
+  width: min(340px, 70vw);
+  height: min(340px, 70vw);
+  border-radius: 50%;
+  padding: 6px;
+  background: linear-gradient(145deg, var(--wine-light), var(--wine) 60%, var(--gold));
+  box-shadow: 0 0 60px -10px var(--wine-glow), 0 20px 40px -20px rgba(0, 0, 0, 0.6);
 }
 
-#iconos{
-    margin: 10px;
+/* Ambient "listening" animation: pulsing rings while the avatar is idle
+   (not actively speaking a D-ID talk response). Paused once streaming. */
+.video-frame::before,
+.video-frame::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--wine-light);
+  opacity: 0;
+  pointer-events: none;
+  animation: pulse-ring 2.6s ease-out infinite;
+}
+.video-frame::after {
+  animation-delay: 1.3s;
 }
 
-#der{
-    padding: 20px;
-    text-align: center;
-   
-   
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.38); opacity: 0; }
 }
 
-#div_tips{
-  margin-top: 100px;
-  padding: 30px;
+body:has(#streaming-status-label.streamingState-streaming) .video-frame::before,
+body:has(#streaming-status-label.streamingState-streaming) .video-frame::after {
+  animation-play-state: paused;
+  opacity: 0;
 }
 
-#tip_label{
-  margin-top: 30px;
+video#talk-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50% !important;
+  background-color: #000;
+  margin: 0;
+  border: 3px solid var(--bg);
 }
 
-.opciones {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    display: block;
-    width: 100%;
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
 }
 
-#talk-button{
-    display: block;
-    width: 100%;
+.mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-#campo_chat{
-    margin-top: auto;
+.mode-btn:hover {
+  color: var(--text);
 }
 
-#conexiones{
-    margin-left: 20px;
-    margin-top: 50px;
+.mode-btn.active {
+  background: var(--wine);
+  color: #fff;
 }
 
-#response-field{
-  padding: 10px;
-  color: #121212;
+#iconos {
+  margin: 0 !important;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-#izq       { height: 100%; } 
+#connect-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+#connect-button:disabled:hover {
+  transform: none;
+}
+
+#iconos .btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+}
+
+#iconos .btn:hover {
+  transform: translateY(-2px);
+}
+
+#iconos .btn:focus {
+  box-shadow: 0 0 0 3px var(--wine-glow);
+}
+
+#connect-button {
+  background: var(--wine);
+  border-color: var(--wine);
+}
+#connect-button:hover { background: var(--wine-light); border-color: var(--wine-light); }
+
+#initiate-button {
+  background: var(--ok);
+  border-color: var(--ok);
+}
+
+#voice-typing-button {
+  background: transparent;
+  border-color: var(--panel-border);
+  color: var(--text);
+}
+#voice-typing-button.btn-success {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+#destroy-button {
+  background: var(--bad);
+  border-color: var(--bad);
+}
+
+/* ---------- Chat panel ---------- */
+
+#der {
+  flex: 1.4 1 460px;
+  max-width: 680px;
+  display: flex !important;
+  flex-direction: column;
+  border: none !important;
+  background: var(--panel);
+  border: 1px solid var(--panel-border) !important;
+  border-radius: var(--radius-lg);
+  padding: 24px !important;
+}
+
+#response-container {
+  flex: 1;
+  min-height: 360px;
+  max-height: 62vh;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+}
+
+#response-field {
+  margin: 0;
+  color: var(--text);
+  text-align: left;
+  line-height: 1.65;
+  font-size: 1.12rem;
+}
+
+#response-field:empty::before {
+  content: 'Presiona el botón verde para que Salomón inicie la cata, o escribe tu mensaje abajo.';
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+#campo_chat {
+  margin: 0 !important;
+}
+
+#user-input-field {
+  background: var(--bg-elevated);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 1.02rem;
+  resize: none;
+  text-align: left;
+}
+
+#user-input-field:focus {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--wine-light);
+  box-shadow: 0 0 0 3px var(--wine-glow);
+}
+
+#user-input-field::placeholder {
+  color: var(--text-dim);
+}
+
+#talk-button {
+  margin-top: 10px;
+  background: var(--wine);
+  border-color: var(--wine);
+  border-radius: var(--radius-md);
+  padding: 10px 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+#talk-button:hover {
+  background: var(--wine-light);
+  border-color: var(--wine-light);
+}
+
+/* ---------- Debug / connection details ---------- */
+
+#conexiones {
+  margin: 0 28px 20px 28px !important;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  text-align: left;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+#conexiones [class*="State-connected"],
+#conexiones [class*="State-completed"] {
+  color: var(--ok);
+}
+#conexiones [class*="State-checking"],
+#conexiones [class*="State-gathering"] {
+  color: var(--warn);
+}
+#conexiones [class*="State-failed"],
+#conexiones [class*="State-closed"],
+#conexiones [class*="State-disconnected"] {
+  color: var(--bad);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .app-body {
+    flex-direction: column;
+    padding: 18px;
+  }
+  #der {
+    max-width: none;
+  }
+}

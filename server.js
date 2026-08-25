@@ -17,8 +17,9 @@ app.use(express.static('public'));
 // Endpoint to handle chat requests
 app.post('/chat', async (req, res) => {
     const prompt = req.body.prompt;
+    const sessionId = req.body.sessionId || req.ip;
     try {
-        const response = await consultar(prompt);
+        const response = await consultar(prompt, sessionId);
         res.json({ message: response });
     } catch (error) {
         console.error("Error occurred:", error);
@@ -26,10 +27,11 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// Endpoint to handle chat requests
+// Endpoint to (re)start the conversation
 app.post('/iniciar', async (req, res) => {
+    const sessionId = req.body.sessionId || req.ip;
     try {
-        const response = await iniciar_conversacion();
+        const response = await iniciar_conversacion(sessionId);
         res.json({ message: response });
     } catch (error) {
         console.error("Error occurred:", error);
