@@ -1,4 +1,4 @@
-# MyndFood — Salomón the AI Sommelier
+# MyndFood — The Digital Sommelier
 
 A browser-based virtual wine sommelier ("Salomón"). You talk or type to it, an
 LLM plays the sommelier persona and guides a wine-tasting session, and a D-ID
